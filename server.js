@@ -6,30 +6,43 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// AI Personality & Memory
+const SYSTEM_MESSAGE = `You are Lupenox, a friendly, witty AI assistant. You love Linux, cybersecurity, and hacking tools. 
+You remember important details from the conversation, like the user's name, and try to keep things fun and engaging.`;
+
+let chatHistory = [];
+
 app.post("/chat", async (req, res) => {
     const userMessage = req.body.message;
 
+    // Add user input to chat history
+    chatHistory.push(`User: ${userMessage}`);
+
     try {
-        // 🧠 Send the message to Ollama
-        const ollamaResponse = await axios.post("http://localhost:11434/api/generate", {
-            model: "mistral",  // Change to "gemma" or another model if needed
-            prompt: userMessage,
-            stream: false
+        const response = await axios.post("http://127.0.0.1:11434/api/generate", {
+            model: "mistral",
+            prompt: `${SYSTEM_MESSAGE}\n${chatHistory.join("\n")}\nAssistant:`,
+            stream: false,
         });
 
-        // 📝 Extract the AI response
-        const botResponse = ollamaResponse.data.response || "I didn't get that.";
+        const botReply = response.data.response;
 
-        console.log(`🤖 AI Response: ${botResponse}`);
-        res.json({ response: botResponse });
+        // Add AI response to chat history
+        chatHistory.push(`Assistant: ${botReply}`);
 
+        res.json({ response: botReply });
     } catch (error) {
-        console.error("⚠️ Error communicating with Ollama:", error);
-        res.status(500).json({ response: "Sorry, something went wrong." });
+        console.error("Error fetching AI response:", error);
+        res.status(500).json({ response: "Oops! Something went wrong." });
     }
 });
 
+// Clear chat history after some time
+setInterval(() => {
+    chatHistory = [];
+}, 30 * 60 * 1000); // Clears every 30 minutes
+
 const PORT = 5000;
 app.listen(PORT, () => {
-    console.log(`🚀 Backend running on http://localhost:${PORT}`);
+    console.log(`🔥 AI Backend running on http://localhost:${PORT}`);
 });
