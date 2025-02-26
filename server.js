@@ -1,17 +1,32 @@
 const express = require("express");
 const cors = require("cors");
+const axios = require("axios");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.post("/chat", (req, res) => {
+app.post("/chat", async (req, res) => {
     const userMessage = req.body.message;
 
-    // TODO: Replace with real AI processing (right now it echoes back)
-    const botResponse = `You said: "${userMessage}"`;
+    try {
+        // 🧠 Send the message to Ollama
+        const ollamaResponse = await axios.post("http://localhost:11434/api/generate", {
+            model: "mistral",  // Change to "gemma" or another model if needed
+            prompt: userMessage,
+            stream: false
+        });
 
-    res.json({ response: botResponse });
+        // 📝 Extract the AI response
+        const botResponse = ollamaResponse.data.response || "I didn't get that.";
+
+        console.log(`🤖 AI Response: ${botResponse}`);
+        res.json({ response: botResponse });
+
+    } catch (error) {
+        console.error("⚠️ Error communicating with Ollama:", error);
+        res.status(500).json({ response: "Sorry, something went wrong." });
+    }
 });
 
 const PORT = 5000;
