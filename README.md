@@ -8,7 +8,7 @@ Now featuring **Ollama & Mistral models**, **voice-to-text**, and a **secure loc
 ---
 
 ## 🚀 Features
-- ✅ **Multiple AI Models** (Mistral, BlenderBot, Falcon, T5)
+- ✅ **Multiple AI Models** (Mistral, BlenderBot, Falcon, T5, Flan-T5, Phi-2, Tiny-Llama, Distil-GPT2)
 - ✅ **Wake-word activation** ("Computer" by default, customizable)
 - ✅ **Voice-to-text** via `speech_recognition`
 - ✅ **Local AI chatbot** (Mistral/Ollama backend)
@@ -26,66 +26,93 @@ sudo apt install portaudio19-dev
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
-2️⃣ Set Up Picovoice (Wake Word)
+### 2️⃣ Set Up Picovoice (Wake Word)
 
-    Sign up at Picovoice Console
-    Get your Access Key and replace it in wake.py:
+1. Sign up at [Picovoice Console](https://console.picovoice.ai/)
+2. Get your Access Key and replace it in `wake.py`:
+   ```python
+   ACCESS_KEY = "your-picovoice-access-key"
+   ```
+3. Optionally, train a custom wake word (e.g., "Lupenox")
 
-    ACCESS_KEY = "your-picovoice-access-key"
+### 3️⃣ Run the AI Chatbot
 
-    Optionally, train a custom wake word (e.g., "Lupenox")
+Use the Bash script to start both Flask and Node.js services:
+```bash
+/home/logan-lapierre/Desktop/personal_projects/local-ai-chatbot/run_chatbot.sh
+```
 
-3️⃣ Run the AI Chatbot
-
-Start the backend:
-
+Or start manually:
+- Start the backend:
+```bash
 python ai_service.py
+```
 
-Start the Electron desktop app:
-
+- Start the Electron desktop app:
+```bash
 npx electron .
+```
 
 Or run the standalone app (Local AI Chatbot in Applications).
-🎛️ Multi-Model Support
+
+---
+
+## 🎛️ Multi-Model Support
 
 You can now switch AI models dynamically!
 
-🧠 Available Models:
-Model Name	Hugging Face ID
-Chemistry-T5	GT4SD/multitask-text-and-chemistry-t5-base-augm
-Mistral Instruct	mistralai/Mistral-7B-Instruct
-BlenderBot (Chatbot)	facebook/blenderbot-400M-distill
-Falcon-7B	tiiuae/falcon-7b-instruct
-Flan-T5 (Instruction-Following)	google/flan-t5-small
+### 🧠 Available Models:
 
-🔹 To select a model, send a request:
+| Model Name     | Hugging Face ID |
+|----------------|-----------------|
+| Chemistry-T5  | GT4SD/multitask-text-and-chemistry-t5-base-augm |
+| Mistral Instruct | mistralai/Mistral-7B-Instruct |
+| BlenderBot (Chatbot) | facebook/blenderbot-400M-distill |
+| Falcon-7B     | tiiuae/falcon-7b-instruct |
+| Flan-T5       | google/flan-t5-small |
+| Tiny Llama    | TinyLlama/TinyLlama-1.1B-Chat-v0.3 |
+| Distil-GPT2   | distilgpt2 |
+| Phi-2         | microsoft/phi-2 |
 
+### 🔹 To select a model, send a request:
+```bash
 curl -X POST "http://127.0.0.1:5001/generate" \
      -H "Content-Type: application/json" \
      -d '{"message": "Hello AI!", "model": "mistral"}'
+```
 
-🖥️ Electron Standalone App
+---
 
-    The chatbot can now run as a desktop app!
-    Installed in ~/Applications/LocalAIChatbot-linux-x64/
-    To launch manually:
+## 🖥️ Electron Standalone App
 
-    ~/Applications/LocalAIChatbot-linux-x64/Local\ AI\ Chatbot --no-sandbox
+- The chatbot can now run as a desktop app!
+- Installed in `~/Applications/LocalAIChatbot-linux-x64/`
+- To launch manually:
 
-    If the desktop shortcut doesn’t work, check local-ai-chatbot.desktop.
+```bash
+~/Applications/LocalAIChatbot-linux-x64/Local\ AI\ Chatbot --no-sandbox
+```
 
-📌 To-Do / Future Features
+- If the desktop shortcut doesn’t work, check `local-ai-chatbot.desktop`.
 
-Custom wake-word support (e.g., "Lupenox")
-Integration with Whisper AI for better speech recognition
-Smart home control (MQTT/Home Assistant)
-Advanced AI personality responses
-Local fine-tuning of AI models
+---
 
-    Convert .webp icons to .ico for better desktop integration
+## 📌 To-Do / Future Features
 
-💙 Contributions & Support
+- Custom wake-word support (e.g., "Lupenox")
+- Integration with Whisper AI for better speech recognition
+- Smart home control (MQTT/Home Assistant)
+- Advanced AI personality responses
+- Local fine-tuning of AI models
+- Convert `.webp` icons to `.ico` for better desktop integration
+
+---
+
+## 💙 Contributions & Support
 
 Want to improve the chatbot? Fork, star, and contribute! 🚀
 Feel free to open an issue if you have feature ideas!
+
+---
