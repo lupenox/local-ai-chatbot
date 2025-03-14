@@ -1,22 +1,28 @@
-const { app, BrowserWindow } = require("electron");
-const path = require("path");
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
 
 function createWindow() {
-    let win = new BrowserWindow({
-        width: 800,
-        height: 600,
+    const win = new BrowserWindow({
+        width: 1200,
+        height: 800,
         webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
-        }
+            contextIsolation: false,
+        },
     });
 
-    // Ensure Electron correctly loads the React build
-    const startURL = `file://${path.join(__dirname, "build", "index.html")}`;
-    console.log("Loading URL:", startURL); // Debugging line
-    win.loadURL(startURL);
-
-    // Open DevTools for debugging
-    win.webContents.openDevTools();
+    win.loadURL('http://localhost:3000');
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    createWindow();
+
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+});
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+});

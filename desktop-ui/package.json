@@ -1,7 +1,0 @@
-{
-  "main": "main.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "react-scripts build"
-  }
-}

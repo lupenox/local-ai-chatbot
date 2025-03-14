@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local AI Chatbot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Local AI Chatbot</h1>
+        
+        <div class="input-section">
+            <textarea id="user-input" placeholder="Type your message here..."></textarea>
+            <select id="model-select">
+                <option value="flan-t5">Flan-T5</option>
+                <option value="distil-gpt2">Distil-GPT2</option>
+                <option value="tiny-llama">Tiny-Llama</option>
+                <option value="phi-2">Phi-2</option>
+                <option value="gpt2">GPT-2</option>
+                <option value="llama-2">Llama-2</option>
+            </select>
+            <button id="send-btn">Send</button>
+            <div id="progress-container" style="display: none;">
+                <div id="progress-bar"></div>
+            </div>            
+        </div>
+
+        <div class="loading" id="loading">Loading...</div>
+
+        <div class="response-section">
+            <h2>AI Response:</h2>
+            <p id="ai-response">Awaiting response...</p>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
