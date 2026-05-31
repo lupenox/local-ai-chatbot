@@ -5,6 +5,7 @@ torch
 speechrecognition
 pyttsx3
 requests
-pvporcupine
 pyaudio
 python-dotenv
+numpy
+openwakeword
