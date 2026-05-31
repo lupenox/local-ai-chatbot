@@ -1,58 +1,53 @@
 import os
-import struct
 
-import pvporcupine
+import numpy as np
 import pyaudio
 import pyttsx3
 import requests
 import speech_recognition as sr
 from dotenv import load_dotenv
+from openwakeword.model import Model
 
 load_dotenv()
 
-PICOVOICE_ACCESS_KEY = os.getenv("PICOVOICE_ACCESS_KEY")
 CHATBOT_API_URL = os.getenv("CHATBOT_API_URL", "http://127.0.0.1:5001/generate")
-WAKE_WORD = os.getenv("WAKE_WORD", "computer")
+WAKEWORD_MODEL_PATH = os.getenv("WAKEWORD_MODEL_PATH")
+WAKEWORD_THRESHOLD = float(os.getenv("WAKEWORD_THRESHOLD", "0.5"))
+SELECTED_MODEL = os.getenv("SELECTED_MODEL", "flan-t5")
 
-if not PICOVOICE_ACCESS_KEY:
+if not WAKEWORD_MODEL_PATH:
     raise RuntimeError(
-        "Missing PICOVOICE_ACCESS_KEY. Add it to a .env file or export it as an environment variable."
+        "Missing WAKEWORD_MODEL_PATH. Add a local openWakeWord .tflite/.onnx model path to your .env file."
     )
 
-porcupine = None
-pa = None
+wake_model = Model(wakeword_models=[WAKEWORD_MODEL_PATH])
+recognizer = sr.Recognizer()
+tts_engine = pyttsx3.init()
+pa = pyaudio.PyAudio()
 stream = None
 
 try:
-    porcupine = pvporcupine.create(
-        access_key=PICOVOICE_ACCESS_KEY,
-        keywords=[WAKE_WORD],
-    )
-    pa = pyaudio.PyAudio()
     stream = pa.open(
         format=pyaudio.paInt16,
         channels=1,
-        rate=porcupine.sample_rate,
+        rate=16000,
         input=True,
-        frames_per_buffer=porcupine.frame_length,
+        frames_per_buffer=1280,
     )
 
-    recognizer = sr.Recognizer()
-    engine = pyttsx3.init()
-
-    print(f"Listening for the wake word: {WAKE_WORD}")
+    print("Listening for wake word with openWakeWord...")
 
     while True:
-        pcm = struct.unpack_from(
-            "h" * porcupine.frame_length,
-            stream.read(porcupine.frame_length, exception_on_overflow=False),
-        )
-        keyword_index = porcupine.process(pcm)
+        audio_bytes = stream.read(1280, exception_on_overflow=False)
+        audio_frame = np.frombuffer(audio_bytes, dtype=np.int16)
+        prediction = wake_model.predict(audio_frame)
 
-        if keyword_index >= 0:
-            print("Wake word detected.")
+        top_score = max(prediction.values()) if prediction else 0
 
-            with sr.Microphone() as source:
+        if top_score >= WAKEWORD_THRESHOLD:
+            print(f"Wake word detected with confidence {top_score:.2f}.")
+
+            with sr.Microphone(sample_rate=16000) as source:
                 print("Say your command...")
                 recognizer.adjust_for_ambient_noise(source)
                 audio = recognizer.listen(source)
@@ -63,15 +58,15 @@ try:
 
                 response = requests.post(
                     CHATBOT_API_URL,
-                    json={"message": command, "model": "flan-t5"},
+                    json={"message": command, "model": SELECTED_MODEL},
                     timeout=60,
                 )
                 response.raise_for_status()
                 bot_reply = response.json().get("response", "Sorry, I didn't get that.")
 
                 print(f"AI Response: {bot_reply}")
-                engine.say(bot_reply)
-                engine.runAndWait()
+                tts_engine.say(bot_reply)
+                tts_engine.runAndWait()
 
             except sr.UnknownValueError:
                 print("Could not understand audio.")
@@ -86,7 +81,4 @@ finally:
     if stream is not None:
         stream.stop_stream()
         stream.close()
-    if pa is not None:
-        pa.terminate()
-    if porcupine is not None:
-        porcupine.delete()
+    pa.terminate()

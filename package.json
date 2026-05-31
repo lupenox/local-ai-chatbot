@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "description": "A local AI chatbot with React and Electron.",
     "main": "main.js",
-    "type": "module",
     "scripts": {
         "start": "concurrently \"npm run electron\" \"npm run react\"",
         "react": "cd ui && npm start",

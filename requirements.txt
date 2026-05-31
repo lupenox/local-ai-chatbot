@@ -1,0 +1,10 @@
+flask
+flask-cors
+transformers
+torch
+speechrecognition
+pyttsx3
+requests
+pvporcupine
+pyaudio
+python-dotenv
