@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # 🚀 Add this import
+from flask_cors import CORS
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, AutoModelForCausalLM
 import torch
 
@@ -19,32 +19,35 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Cache for loaded models and tokenizers
 model_cache = {}
 
+
 def load_model(model_name):
     """Load model and tokenizer, caching for efficiency."""
     if model_name not in model_cache:
-        print(f"🔄 Loading model: {model_name}")
+        print(f"Loading model: {model_name}")
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = (
-            AutoModelForSeq2SeqLM.from_pretrained(
-                model_name, torch_dtype=torch.float32, low_cpu_mem_usage=True
-            ) if "t5" in model_name else AutoModelForCausalLM.from_pretrained(
-                model_name, torch_dtype=torch.float32, low_cpu_mem_usage=True
-            )
+        model_class = AutoModelForSeq2SeqLM if "t5" in model_name else AutoModelForCausalLM
+        model = model_class.from_pretrained(
+            model_name,
+            dtype=torch.float32,
+            low_cpu_mem_usage=True,
         ).to(device)
         model_cache[model_name] = (tokenizer, model)
     return model_cache[model_name]
 
+
 # Flask API setup
 app = Flask(__name__)
-CORS(app)  # 🚀 Enable CORS for all routes
+CORS(app)
+
 
 @app.route("/", methods=["GET"])
 def home():
-    return "🚀 Local AI Chatbot is running!"
+    return "Local AI Chatbot is running!"
+
 
 @app.route("/generate", methods=["POST"])
 def generate_response():
-    data = request.json
+    data = request.get_json(silent=True) or {}
     user_input = data.get("message", "").strip()
     selected_model = data.get("model", "flan-t5").strip()
 
@@ -67,11 +70,11 @@ def generate_response():
         do_sample=True,
         top_k=50,
         top_p=0.95,
-        early_stopping=True
     )
     output_text = tokenizer.decode(output_tokens[0], skip_special_tokens=True)
 
     return jsonify({"response": output_text})
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5001, debug=True)
