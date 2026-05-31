@@ -15,7 +15,7 @@ The goal of this project is to explore privacy-focused local AI workflows by com
 - Flask API backend for local inference
 - Multiple model selection support
 - Speech recognition integration
-- Wake-word workflow support
+- Local wake-word workflow support
 - Text-to-speech responses
 - Privacy-focused local execution
 
@@ -36,7 +36,7 @@ The goal of this project is to explore privacy-focused local AI workflows by com
 ### Voice Features
 - SpeechRecognition
 - PyAudio
-- Picovoice Porcupine
+- openWakeWord
 - pyttsx3
 
 ## Architecture
@@ -92,7 +92,7 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Add your Picovoice access key to `.env`.
+Set `WAKEWORD_MODEL_PATH` in `.env` to the path of your local openWakeWord model file. The wake-word script is optional; the desktop chat app and Flask backend can run without it.
 
 ### 4. Install frontend and Electron dependencies
 
