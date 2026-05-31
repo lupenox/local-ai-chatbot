@@ -6,7 +6,7 @@ The goal of this project is to explore privacy-focused local AI workflows by com
 
 # Screenshot:
 
-![App Screenshot](ui/images/Local_AI.png)
+![App Screenshot](ui/images/SC.png)
 
 ## Features
 
