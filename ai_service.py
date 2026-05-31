@@ -17,7 +17,7 @@ HUGGINGFACE_MODELS = {
 }
 
 DEFAULT_HUGGINGFACE_MODEL = "flan-t5"
-DEFAULT_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+DEFAULT_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral:latest")
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://127.0.0.1:11434/api/generate")
 
 # Set up device
