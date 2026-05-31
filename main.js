@@ -5,6 +5,7 @@ function createWindow() {
     const win = new BrowserWindow({
         width: 1200,
         height: 800,
+        title: 'Local Multi-Model AI Assistant',
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
@@ -16,6 +17,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+    app.name = 'Local Multi-Model AI Assistant';
     createWindow();
 
     app.on('activate', () => {
