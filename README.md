@@ -4,6 +4,10 @@ A desktop AI assistant prototype built with React, Electron, Flask, Hugging Face
 
 The goal of this project is to explore privacy-focused local AI workflows by combining a desktop interface, local model inference, speech interaction, and dynamic model selection into a single application.
 
+# Screenshot:
+
+![App Screenshot](ui/images/Local_AI.png)
+
 ## Features
 
 - Desktop application powered by Electron
