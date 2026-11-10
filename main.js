@@ -8,12 +8,12 @@ function createWindow() {
         title: 'Local Multi-Model AI Assistant',
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            nodeIntegration: true,
-            contextIsolation: false,
+            contextIsolation: true,
+            nodeIntegration: false,
         },
     });
 
-    win.loadURL('http://localhost:3000');
+    win.loadURL(process.env.ELECTRON_START_URL || 'http://localhost:3000');
 }
 
 app.whenReady().then(() => {

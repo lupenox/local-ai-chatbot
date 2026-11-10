@@ -1,27 +1,26 @@
 {
-    "name": "local-ai-chatbot-ui",
-    "version": "1.0.0",
-    "description": "A local AI chatbot with React and Electron.",
-    "main": "main.js",
-    "scripts": {
-        "start": "concurrently \"npm run electron\" \"npm run react\"",
-        "react": "cd ui && npm start",
-        "electron": "wait-on http://localhost:3000 && electron .",
-        "build": "cd ui && npm run build",
-        "package": "electron-packager . local-ai-chatbot --platform=linux --arch=x64 --out=dist --overwrite"
-    },
-    "author": "Logan Lapierre",
-    "license": "MIT",
-    "dependencies": {
-        "axios": "^1.6.2",
-        "concurrently": "^8.2.0",
-        "cors": "^2.8.5",
-        "electron": "^27.1.2",
-        "express": "^4.21.2",
-        "node-fetch": "^3.3.2",
-        "wait-on": "^7.0.1"
-    },
-    "devDependencies": {
-        "electron-packager": "^17.1.1"
-    }
+  "name": "local-ai-chatbot-ui",
+  "version": "1.0.0",
+  "description": "A privacy-first local multi-model AI assistant built with React, Electron, Flask, Hugging Face, and Ollama.",
+  "main": "main.js",
+  "scripts": {
+    "start": "concurrently \"npm run electron\" \"npm run react\"",
+    "react": "cd ui && npm start",
+    "electron": "wait-on http://localhost:3000 && electron .",
+    "build": "cd ui && npm run build",
+    "package": "electron-packager . local-ai-chatbot --platform=linux --arch=x64 --out=dist --overwrite"
+  },
+  "author": "Logan Lapierre",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.0",
+    "electron": "^27.1.2",
+    "wait-on": "^7.0.1"
+  },
+  "devDependencies": {
+    "electron-packager": "^17.1.1"
+  },
+  "allowScripts": {
+    "electron@27.3.11": true
+  }
 }

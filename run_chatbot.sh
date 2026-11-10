@@ -1,60 +1,40 @@
 #!/bin/bash
+set -e
 
-# Set the project directory
 PROJECT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$PROJECT_DIR"
 
-cd "$PROJECT_DIR" || exit 1
+echo "Starting Local Multi-Model AI Assistant..."
 
-echo "🚀 Starting Local AI Chatbot..."
-
-# Activate virtual environment
-if [ -d "$PROJECT_DIR/venv" ]; then
+if [ -d "$PROJECT_DIR/.venv" ]; then
+    source "$PROJECT_DIR/.venv/bin/activate"
+    echo "Activated virtual environment (.venv)."
+elif [ -d "$PROJECT_DIR/venv" ]; then
     source "$PROJECT_DIR/venv/bin/activate"
-    echo "✅ Virtual environment activated."
+    echo "Activated virtual environment (venv)."
 else
-    echo "❌ Virtual environment not found. Exiting."
+    echo "Error: No Python virtual environment found (.venv or venv)."
     exit 1
 fi
 
-# Kill existing processes on ports 5000, 5001, and 3000
-for PORT in 5000 5001 3000; do
-    if sudo lsof -t -i:$PORT &>/dev/null; then
-        sudo fuser -k ${PORT}/tcp 2>/dev/null
-        echo "🔄 Killed process running on port $PORT."
+cleanup() {
+    echo ""
+    echo "Shutting down services..."
+    if [ -n "${AI_PID:-}" ] && kill -0 "$AI_PID" 2>/dev/null; then
+        kill "$AI_PID" 2>/dev/null || true
     fi
-done
+}
+trap cleanup EXIT INT TERM
 
-# Launch AI Service
-echo "🔹 Launching AI Service..."
+echo "Launching Flask AI Service on http://127.0.0.1:5001..."
 python "$PROJECT_DIR/ai_service.py" &
 AI_PID=$!
-sleep 2  # Allow time for Flask to start
-
-# Check if Flask service is running
-if ! kill -0 $AI_PID 2>/dev/null; then
-    echo "❌ Failed to start AI Service. Exiting."
-    exit 1
-else
-    echo "✅ AI Service is running on port 5001."
-fi
-
-# Launch Node.js Server
-echo "🔹 Launching Node.js Server..."
-node "$PROJECT_DIR/server.js" &
-NODE_PID=$!
-
-# Check if Node.js service is running
 sleep 2
-if ! kill -0 $NODE_PID 2>/dev/null; then
-    echo "❌ Failed to start Node.js server. Exiting."
-    kill $AI_PID 2>/dev/null
+
+if ! kill -0 "$AI_PID" 2>/dev/null; then
+    echo "Error: Failed to start ai_service.py."
     exit 1
-else
-    echo "✅ Node.js Server is running on port 3000."
 fi
 
-echo "✅ Chatbot Backend is fully operational! (Press Ctrl+C to stop)"
-
-# Wait for processes to end
-wait $AI_PID
-wait $NODE_PID
+echo "Launching Electron + React UI..."
+npm start
